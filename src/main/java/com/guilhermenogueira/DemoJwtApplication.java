@@ -15,6 +15,11 @@ public class DemoJwtApplication {
 	
 	@GetMapping("/")
 	public String home() {
-		return "Home Page";
+		return "Home Page Authenticated";
+	}
+	
+	@GetMapping("/home")
+	public String homePublic() {
+		return "Home Page Public";
 	}
 }

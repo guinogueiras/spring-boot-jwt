@@ -1,6 +1,7 @@
 package com.guilhermenogueira.jwt.filter;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Collections;
 
 import javax.servlet.FilterChain;
@@ -30,8 +31,19 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
     public Authentication attemptAuthentication(
             HttpServletRequest req, HttpServletResponse res)
             throws AuthenticationException, IOException, ServletException {
-        UserCredentials creds = new ObjectMapper().readValue(req.getInputStream(), UserCredentials.class);
-
+       
+    	UserCredentials creds = new UserCredentials();
+    	
+    	try {
+    		String basic = req.getHeader("authorization");
+    		String decoded = new String(Base64.getDecoder().decode(basic.replace("Basic ", "")));
+    		creds.setUsername(decoded.split(":")[0]);
+    		creds.setPassword(decoded.split(":")[1]);
+			
+		} catch (Exception e) {
+			creds = new ObjectMapper().readValue(req.getInputStream(), UserCredentials.class);
+		}
+        
         return getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(
                         creds.getUsername(),

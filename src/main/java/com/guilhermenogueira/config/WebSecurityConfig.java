@@ -1,11 +1,13 @@
 package com.guilhermenogueira.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.guilhermenogueira.jwt.filter.JWTAuthenticationFilter;
@@ -14,6 +16,9 @@ import com.guilhermenogueira.jwt.filter.JWTLoginFilter;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	
+//	@Autowired
+//	private AuthenticationEntryPoint authEntryPoint;
 
 	@Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
@@ -21,6 +26,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers("/home").permitAll()
 			.antMatchers(HttpMethod.POST, "/login").permitAll()
 			.anyRequest().authenticated()
+//			.and().httpBasic().authenticationEntryPoint(authEntryPoint)
 			.and()
 			
 			// filtra requisições de login
@@ -36,4 +42,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.inMemoryAuthentication()
 			.withUser("admin").password("{noop}password").roles("ADMIN");
 	}
+	
 }

@@ -35,12 +35,10 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
     	UserCredentials creds = new UserCredentials();
     	
     	try {
-    		String basic = req.getHeader("authorization");
-    		String decoded = new String(Base64.getDecoder().decode(basic.replace("Basic ", "")));
-    		creds.setUsername(decoded.split(":")[0]);
-    		creds.setPassword(decoded.split(":")[1]);
-			
+    		//Bind para UserCredentials do Header "authorization: Basic YWRtaW46cGFzc3dvcmQ="
+    		creds = getUserCredentialsByBasicAuthorization(req);
 		} catch (Exception e) {
+			//Bind para UserCredentials do Body "{"username":"usr","password":"s3cret"}"
 			creds = new ObjectMapper().readValue(req.getInputStream(), UserCredentials.class);
 		}
         
@@ -52,6 +50,19 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
                 )
         );
     }
+    
+    private static UserCredentials getUserCredentialsByBasicAuthorization(HttpServletRequest req) {
+    	String authorization = req.getHeader("authorization");
+		String decoded = new String(Base64.getDecoder().decode(authorization.replace("Basic ", "")));
+		String[] userDetails = decoded.split(":", 2);
+		
+		UserCredentials userCredentials = new UserCredentials();
+		userCredentials.setUsername(userDetails[0]);
+		userCredentials.setPassword(userDetails[1]);
+		
+		return userCredentials;
+    }
+
 
     @Override
     protected void successfulAuthentication(
